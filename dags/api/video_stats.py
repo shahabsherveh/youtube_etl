@@ -87,7 +87,7 @@ def get_video_stats(video_ids):
             content_details = item['contentDetails']
             statistics = item['statistics']
             video_item_stats = {
-                'id': item['id'],
+                'video_id': item['id'],
                 'title': snippet['title'],
                 'publishedAt': snippet.get('publishedAt'),
                 'duration': content_details.get('duration'),
