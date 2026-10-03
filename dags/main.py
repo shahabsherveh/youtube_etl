@@ -2,11 +2,14 @@ from airflow import DAG
 import pendulum
 from datetime import datetime, timedelta
 
-# Import functions needed to fetch the data from youtube
+# Import tasks needed to fetch the data from youtube
 from api.video_stats import get_playlist_id, get_video_ids, get_video_stats, save_to_json, get_youtube_session
 
-# Import functions needed for updating database
+# Import tasks needed for updating database
 from datawarehouse.dwh import staging_table, core_table
+
+# Import tasks needed for quality checks
+from dataquality.soda import yt_elt_data_quality
 
 # Define the local timezone
 local_tz = pendulum.timezone("Iran")
@@ -51,10 +54,21 @@ with DAG(
     update_staging = staging_table()
     update_core = core_table()
 
-    # trigger_data_quality = TriggerDagRunOperator(
-    #     task_id="trigger_data_quality",
-    #     trigger_dag_id="data_quality",
-    # )
-
     # Define dependencies
     update_staging >> update_core
+
+with DAG(
+    dag_id="quality_check",
+    default_args=default_args,
+    description="Checks quality for both staging and core schemas in ELT DB",
+    catchup=False,
+    schedule=None,
+) as dag_update:
+
+    # Define tasks
+
+    soda_validating_staging = yt_elt_data_quality('staging')
+    soda_validating_core = yt_elt_data_quality('core')
+
+    # Tasks dependencies
+    soda_validating_staging >> soda_validating_core
