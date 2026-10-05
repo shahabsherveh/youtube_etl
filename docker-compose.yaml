@@ -49,10 +49,7 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider distributions you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  build: .
-  image: ${DOCKERHUB_NAMESPACE}/${DOCKERHUB_REPOSITORY}:${IMAGE_TAG}
-  env_file:
-    - .env
+  image: ${DOCKERHUB_NAMESPACE}/${DOCKERHUB_REPOSITORY}:latest
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -108,29 +105,27 @@ x-airflow-common:
 services:
   postgres:
     image: postgres:16
-    env_file:
-      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_CONN_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_CONN_PASSWORD}
 
-      # POSTGRES_CONN_HOST: ${POSTGRES_CONN_HOST}
-      # POSTGRES_CONN_PORT: ${POSTGRES_CONN_PORT}
-      #
-      # # Metadata database credentials
-      # METADATA_DATABASE_NAME: ${METADATA_DATABASE_NAME}
-      # METADATA_DATABASE_USERNAME: ${METADATA_DATABASE_USERNAME}
-      # METADATA_DATABASE_PASSWORD: ${METADATA_DATABASE_PASSWORD}
-      #
-      # # Celery database credentials
-      # CELERY_BACKEND_NAME: ${CELERY_BACKEND_NAME}
-      # CELERY_BACKEND_USERNAME: ${CELERY_BACKEND_USERNAME}
-      # CELERY_BACKEND_PASSWORD: ${CELERY_BACKEND_PASSWORD}
-      #
-      # # ELT database credentials
-      # ELT_DATABASE_NAME: ${ELT_DATABASE_NAME}
-      # ELT_DATABASE_USERNAME: ${ELT_DATABASE_USERNAME}
-      # ELT_DATABASE_PASSWORD: ${ELT_DATABASE_PASSWORD}
+      POSTGRES_CONN_HOST: ${POSTGRES_CONN_HOST}
+      POSTGRES_CONN_PORT: ${POSTGRES_CONN_PORT}
+
+      # Metadata database credentials
+      METADATA_DATABASE_NAME: ${METADATA_DATABASE_NAME}
+      METADATA_DATABASE_USERNAME: ${METADATA_DATABASE_USERNAME}
+      METADATA_DATABASE_PASSWORD: ${METADATA_DATABASE_PASSWORD}
+
+      # Celery database credentials
+      CELERY_BACKEND_NAME: ${CELERY_BACKEND_NAME}
+      CELERY_BACKEND_USERNAME: ${CELERY_BACKEND_USERNAME}
+      CELERY_BACKEND_PASSWORD: ${CELERY_BACKEND_PASSWORD}
+
+      # ELT database credentials
+      ELT_DATABASE_NAME: ${ELT_DATABASE_NAME}
+      ELT_DATABASE_USERNAME: ${ELT_DATABASE_USERNAME}
+      ELT_DATABASE_PASSWORD: ${ELT_DATABASE_PASSWORD}
 
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
@@ -161,6 +156,7 @@ services:
   airflow-apiserver:
     <<: *airflow-common
     command: api-server
+    container_name: airflow-apiserver
     ports:
       - "8080:8080"
     healthcheck:
