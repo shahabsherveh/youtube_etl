@@ -55,7 +55,7 @@ jobs:
       POSTGRES_CONN_USERNAME: ${{ vars.POSTGRES_CONN_USERNAME }}
       POSTGRES_CONN_HOST: ${{ vars.POSTGRES_CONN_HOST }}
       POSTGRES_CONN_PORT: ${{ vars.POSTGRES_CONN_PORT }}
-      POSTGRES_CONN_PASSWORD: ${{ vars.POSTGRES_CONN_PASSWORD }}
+      POSTGRES_CONN_PASSWORD: ${{ secrets.POSTGRES_CONN_PASSWORD }}
 
       METADATA_DATABASE_NAME: ${{ vars.METADATA_DATABASE_NAME }}
       METADATA_DATABASE_USERNAME: ${{ vars.METADATA_DATABASE_USERNAME }}
@@ -99,7 +99,7 @@ jobs:
       - name: Run E2E tests
         if: steps.changed-files-tests.outputs.any_changed == 'true'|| github.event_name == 'workflow_dispatch'
         run: |
-          DAG_NAMES = ("produce_json", "update_db", "quality_check")
+          DAG_NAMES=("produce_json" "update_db" "quality_check")
 
           for DAG in "${DAG_NAMES[@]}"; do
             docker exec -t airflow-apiserver sh -c "airflow dags test $DAG"
@@ -108,5 +108,3 @@ jobs:
       - name: Tear down docker compose
         if: steps.changed-files-tests.outputs.any_changed == 'true'|| github.event_name == 'workflow_dispatch'
         run: docker compose down --volumes --remove-orphans
-
-
