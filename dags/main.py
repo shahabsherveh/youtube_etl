@@ -52,6 +52,7 @@ with DAG(
     dag_id="update_db",
     default_args=default_args,
     description="DAG to process JSON file and insert data into both staging and core schemas",
+    is_paused_upon_creation=False,
     catchup=False,
     schedule=None,
 ) as dag_update:
@@ -71,6 +72,7 @@ with DAG(
     dag_id="quality_check",
     default_args=default_args,
     description="Checks quality for both staging and core schemas in ELT DB",
+    is_paused_upon_creation=False,
     catchup=False,
     schedule=None,
 ) as dag_update:
