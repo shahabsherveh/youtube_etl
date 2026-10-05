@@ -39,9 +39,9 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
-          tags: 
-            - ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest
-            - ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
+          tags: |
+             ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest
+             ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
 
   unit-integration-e2e-tests:
     runs-on: ubuntu-latest
