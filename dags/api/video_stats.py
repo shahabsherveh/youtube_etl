@@ -3,7 +3,6 @@ import json
 
 import os
 
-import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
 from google.auth.api_key import Credentials
@@ -19,11 +18,6 @@ channel_handle = Variable.get('YOUTUBE_CHANNEL_HANDLE')
 
 def get_youtube_session(api_version="v3"):
     api_service_name = "youtube"
-    # client_secrets_file = "YOUR_CLIENT_SECRET_FILE.json"
-    # Get credentials and create an API client
-    # flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
-    #     client_secrets_file, scopes)
-    # credentials = flow.run_console()
     credentials = Credentials(youtube_api_key)
     youtube = googleapiclient.discovery.build(
         api_service_name, api_version, credentials=credentials)
@@ -35,11 +29,14 @@ session = get_youtube_session()
 
 @task
 def get_playlist_id():
-    request = session.channels().list(
-        forHandle=channel_handle, part='contentDetails')
-    response = request.execute()
-    playlist_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-    return playlist_id
+    try:
+        request = session.channels().list(
+            forHandle=channel_handle, part='contentDetails')
+        response = request.execute()
+        playlist_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+        return playlist_id
+    except googleapiclient.errors.HttpError as e:
+        print("Failed to fetch the playlist id with error: {}".format(e))
 
 
 @task
