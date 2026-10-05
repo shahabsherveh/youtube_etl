@@ -2,12 +2,11 @@ name: CI-CD Pipeline
 on:
   push:
     branches:
-      -main
-      -'feature/*'
+      - main
+      - 'feature/*'
   pull_request:
     branches:
-      -main
-
+      - main
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
